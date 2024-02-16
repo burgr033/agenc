@@ -9,6 +9,30 @@ import (
 	"path/filepath"
 )
 
+/*
+	TODO: [ ] Comment every function
+	TODO: [ ] take care of every error
+	TODO: [ ] validate file paths before passing to Encrypt() or Decrypt()
+	TODO: [ ] Validate if the files are actually encrypted before Decryption (using the age header)
+	TODO: [ ] Validate if the files are actually unencrypted before Encryption (don't know how to do that yet)
+	TODO: [ ] if no command is passed it should encrypt per default
+	TODO: [ ] Try optimizing the code
+	TODO: [ ] try to optimize and streamline logging and error output
+	TODO: [ ] try to make the package smaller when compiled
+	TODO: [ ] Try implementing wildcards
+	TODO: [ ] be sure that everything is working correctly
+	TODO: [ ] support other key types
+	TODO: [ ] don't hardcode the key type to ssh and ask during config stage
+	TODO: [ ] make the config stage more user friendly
+	TODO: [ ] during config check if the files exist. if not > reconfigure
+	TODO: [ ] implement healthcheck that verifies that everything is working correctly
+	TODO: [ ] maybe change cli framework? I really wanna use something from charm
+
+
+
+
+*/
+
 // Config struct for config File
 type Config struct {
 	PubKeyPath  string `json:"PubKeyPath"`
