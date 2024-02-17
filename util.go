@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-// converts the input filename to the output filename (adds the age extension)
+// getOutputFileName converts the input filename to the output filename (adds the age extension)
 func getOutputFileName(inputFilename string) string {
 
 	outputFilename := inputFilename + ".age"
@@ -15,15 +16,21 @@ func getOutputFileName(inputFilename string) string {
 
 }
 
-// TODO: [A] Currently the file suffix is just trimmed anyway, without checking that it's actually the age suffix. It should be checked if there is an age suffix. If not this function should return the normal file name.
+// getOutputFileNameDecrypt converts the taken file name and trims .age if existing
 // TODO: [B] better function name
 func getOutputFileNameDecrypt(inputFilename string) string {
 
 	extension := filepath.Ext(inputFilename)
+	if extension != ".age" {
+		fmt.Println("Note: File name does not contain .age extension. Filename not changed.")
+		return inputFilename
+	}
 	outputFilename := strings.TrimSuffix(inputFilename, extension)
 	return outputFilename
 
 }
+
+// readConfig reads the config file and returns config type
 func readConfig() (Config, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
