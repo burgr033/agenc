@@ -15,6 +15,8 @@ func getOutputFileName(inputFilename string) string {
 
 }
 
+// TODO: [A] Currently the file suffix is just trimmed anyway, without checking that it's actually the age suffix. It should be checked if there is an age suffix. If not this function should return the normal file name.
+// TODO: [B] better function name
 func getOutputFileNameDecrypt(inputFilename string) string {
 
 	extension := filepath.Ext(inputFilename)
@@ -34,7 +36,11 @@ func readConfig() (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+		}
+	}(file)
 
 	var config Config
 	decoder := json.NewDecoder(file)

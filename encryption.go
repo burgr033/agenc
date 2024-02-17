@@ -9,14 +9,14 @@ import (
 	"os"
 )
 
-// uses ParseRecipient from agessh to return recipient
+// getRecipientFromSSHKeyFile is given the config and uses ParseRecipient from agessh to return recipient
 func getRecipientFromSSHKeyFile(config Config) age.Recipient {
 	keyContent := getSSHPubKeyFileContent(config)
 	recipient, _ := agessh.ParseRecipient(keyContent)
 	return recipient
 }
 
-// reads Pubkey file
+// getSSHPubKeyFileContent given the config gets the PubKey and returns it
 func getSSHPubKeyFileContent(config Config) string {
 	filepath := config.PubKeyPath
 	b, err := os.ReadFile(filepath)
@@ -27,6 +27,7 @@ func getSSHPubKeyFileContent(config Config) string {
 }
 
 // encryptFile encrypts the file via age and saves the output to the new file
+// TODO: [A] Check if the file is encrypted before encrypting to prevent double encryption (if ageheader is not present)
 func encryptFile(inputFilename string, recipient age.Recipient) {
 
 	var inputFile, _ = os.Open(inputFilename)

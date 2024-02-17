@@ -3,30 +3,30 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/urfave/cli/v2"
-	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/urfave/cli/v2"
 )
 
 /*
-	TODO: [ ] Comment every function
-	TODO: [ ] take care of every error
-	TODO: [ ] validate file paths before passing to Encrypt() or Decrypt()
-	TODO: [ ] Validate if the files are actually encrypted before Decryption (using the age header)
-	TODO: [ ] Validate if the files are actually unencrypted before Encryption (don't know how to do that yet)
-	TODO: [ ] if no command is passed it should encrypt per default
-	TODO: [ ] Try optimizing the code
-	TODO: [ ] try to optimize and streamline logging and error output
-	TODO: [ ] try to make the package smaller when compiled
-	TODO: [ ] Try implementing wildcards
-	TODO: [ ] be sure that everything is working correctly
-	TODO: [ ] support other key types
-	TODO: [ ] don't hardcode the key type to ssh and ask during config stage
-	TODO: [ ] make the config stage more user friendly
-	TODO: [ ] during config check if the files exist. if not > reconfigure
-	TODO: [ ] implement healthcheck that verifies that everything is working correctly
-	TODO: [ ] maybe change cli framework? I really wanna use something from charm
+	TODO: [A] Comment every function
+	TODO: [A] take care of every error
+	TODO: [A] validate file paths before passing to Encrypt() or Decrypt() (filepath and stat)
+	TODO: [A] try to optimize and streamline logging and error output (should be one explicit error format)
+
+	TODO: [B] Try optimizing the code
+	TODO: [B] Try implementing wildcards for file names
+	TODO: [B] during config check if the files exist. if not > reconfigure
+	TODO: [B] implement healthcheck that verifies that everything is working correctly
+	TODO: [B] be sure that everything is working correctly (test)
+	TODO: [B] make the config stage more user friendly
+
+	TODO: [C] support other key types
+	TODO: [C] Set variables to useful names
+	TODO: [C] try to make the package smaller when compiled
+	TODO: [C] don't hardcode the key type to ssh and ask during config stage
+	TODO: [C] maybe change cli framework? I really wanna use something from charm
 
 
 
@@ -43,6 +43,7 @@ type Config struct {
 // path to config file
 const configFilePath = ".agencrc"
 
+// TODO: [B] if no command is passed it should encrypt per default
 func main() {
 	app := &cli.App{
 		Name:  "agenc",
@@ -71,7 +72,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 }
 
@@ -97,7 +98,7 @@ func configAction(c *cli.Context) error {
 
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("error getting user dir: ", err)
 	}
 
 	configPath := filepath.Join(homeDir, configFilePath)
@@ -107,13 +108,13 @@ func configAction(c *cli.Context) error {
 		return nil
 	}
 
-	fmt.Print("enter the path to your public key: ")
+	fmt.Println("enter the path to your public key: ")
 	PubkeyPath := ""
 	_, err = fmt.Scanln(&PubkeyPath)
 	if err != nil {
 		return err
 	}
-	fmt.Print("enter the path to your private key: ")
+	fmt.Println("enter the path to your private key: ")
 	PrivkeyPath := ""
 	_, err = fmt.Scanln(&PrivkeyPath)
 	if err != nil {
@@ -127,19 +128,19 @@ func configAction(c *cli.Context) error {
 
 	file, err := os.Create(configPath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
 		}
 	}(file)
 
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(config)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 	fmt.Println("config file created.")

@@ -11,6 +11,8 @@ import (
 	"os"
 )
 
+// getIdentityFromSSHKeyFile takes the json config and returns the age identity by decrypting the encrypted SSH private
+// key by password.
 func getIdentityFromSSHKeyFile(config Config) (age.Identity, error) {
 	keyContent := getSSHPrivKeyFileContent(config)
 	fmt.Print("Please enter SSH Key Password for ", config.PrivKeyPath, ": ")
@@ -23,6 +25,10 @@ func getIdentityFromSSHKeyFile(config Config) (age.Identity, error) {
 		return nil, fmt.Errorf("ffs")
 	}
 }
+
+// decryptFile takes the file name and age identity to decrypt the file and write it to the output file.
+// Output File is the file without the .age suffix
+// TODO: [A] Validate if the files are actually encrypted before Decryption (using the age header)
 func decryptFile(inputFilename string, identity age.Identity) {
 	outputFilename := getOutputFileNameDecrypt(inputFilename)
 	encryptedFile, _ := os.Open(inputFilename)
@@ -35,7 +41,8 @@ func decryptFile(inputFilename string, identity age.Identity) {
 	outputFile.Close()
 }
 
-// reads config file
+// TODO: [B] Check if we could merge this with getSSHPubKeyFileContent which returns a string and not byte...
+// getSSHPrivKeyFileContent is given the config and returns the private key as byte slice
 func getSSHPrivKeyFileContent(config Config) []byte {
 	filepath := config.PrivKeyPath
 	b, err := os.ReadFile(filepath)
