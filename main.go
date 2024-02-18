@@ -15,7 +15,6 @@ import (
 	TODO: [A] validate file paths before passing to Encrypt() or Decrypt() (filepath and stat)
 	TODO: [A] try to optimize and streamline logging and error output (should be one explicit error format)
 
-	TODO: [B] Try optimizing the code
 	TODO: [B] Try implementing wildcards for file names
 	TODO: [B] during config check if the files exist. if not > reconfigure
 	TODO: [B] implement healthcheck that verifies that everything is working correctly
@@ -78,8 +77,13 @@ func main() {
 
 func encryptAction(c *cli.Context) error {
 	config, _ := readConfig()
+
 	recipient := getRecipientFromSSHKeyFile(config)
 	for i := 0; i < c.Args().Len(); i++ {
+		if checkAgeHeaderPresence(c.Args().Get(i)) {
+			fmt.Println("File is already encrypted... exiting")
+			os.Exit(1)
+		}
 		encryptFile(c.Args().Get(i), recipient)
 	}
 	return nil
@@ -89,6 +93,10 @@ func decryptAction(c *cli.Context) error {
 	config, _ := readConfig()
 	identity, _ := getIdentityFromSSHKeyFile(config)
 	for i := 0; i < c.Args().Len(); i++ {
+		if !checkAgeHeaderPresence(c.Args().Get(i)) {
+			fmt.Println("File does not seem encrypted... exiting")
+			os.Exit(1)
+		}
 		decryptFile(c.Args().Get(i), identity)
 	}
 	return nil

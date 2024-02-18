@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -16,9 +17,24 @@ func getOutputFileName(inputFilename string) string {
 
 }
 
+// checkAgeHeaderPresence takes a file name opens the file and checks the first 22 bytes for the age header
+func checkAgeHeaderPresence(inputFilename string) bool {
+	header, _ := os.Open(inputFilename)
+	expectedHeaderHex := "6167652D656E6372797074696F6E2E6F72672F76310A2D3E207373682D65643235353139"
+	expectedHeader, _ := hex.DecodeString(expectedHeaderHex)
+	headerBytes := make([]byte, len(expectedHeader))
+	header.Read(headerBytes)
+	if string(headerBytes) == string(expectedHeader) {
+		header.Close()
+		return true
+	} else {
+		header.Close()
+		return false
+	}
+}
+
 // getOutputFileNameDecrypt converts the taken file name and trims .age if existing
-// TODO: [B] better function name
-func getOutputFileNameDecrypt(inputFilename string) string {
+func getOutputFileNameWithoutAge(inputFilename string) string {
 
 	extension := filepath.Ext(inputFilename)
 	if extension != ".age" {
@@ -27,7 +43,6 @@ func getOutputFileNameDecrypt(inputFilename string) string {
 	}
 	outputFilename := strings.TrimSuffix(inputFilename, extension)
 	return outputFilename
-
 }
 
 // readConfig reads the config file and returns config type
@@ -57,4 +72,21 @@ func readConfig() (Config, error) {
 	}
 
 	return config, nil
+}
+
+// getSSHKeyFileContent is given the config and returns the private key as byte slice
+func getSSHKeyFileContent(config Config, isPublic bool) ([]byte, error) {
+	var filepath string
+	if isPublic {
+		filepath = config.PubKeyPath
+	} else {
+		filepath = config.PrivKeyPath
+	}
+
+	b, err := os.ReadFile(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }
