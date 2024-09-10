@@ -9,18 +9,17 @@ import (
 	"strings"
 )
 
+var expectedHeaderHex = "6167652D656E6372797074696F6E2E6F72672F76310A" // age-encryption.org/v1
+
 // getOutputFileName converts the input filename to the output filename (adds the age extension)
 func getOutputFileName(inputFilename string) string {
-
 	outputFilename := inputFilename + ".age"
 	return outputFilename
-
 }
 
 // checkAgeHeaderPresence takes a file name opens the file and checks the first 22 bytes for the age header
 func checkAgeHeaderPresence(inputFilename string) bool {
 	header, _ := os.Open(inputFilename)
-	expectedHeaderHex := "6167652D656E6372797074696F6E2E6F72672F76310A2D3E207373682D65643235353139"
 	expectedHeader, _ := hex.DecodeString(expectedHeaderHex)
 	headerBytes := make([]byte, len(expectedHeader))
 	header.Read(headerBytes)
@@ -35,7 +34,6 @@ func checkAgeHeaderPresence(inputFilename string) bool {
 
 // getOutputFileNameDecrypt converts the taken file name and trims .age if existing
 func getOutputFileNameWithoutAge(inputFilename string) string {
-
 	extension := filepath.Ext(inputFilename)
 	if extension != ".age" {
 		fmt.Println("Note: File name does not contain .age extension. Filename not changed.")
