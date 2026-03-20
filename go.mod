@@ -1,6 +1,8 @@
+// Deprecated: use codeberg.org/burgr/agenc instead.
 module agenc
 
 go 1.22.0
+
 toolchain go1.24.1
 
 require (
